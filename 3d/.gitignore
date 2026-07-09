@@ -243,13 +243,3 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-
-#################
-# Chili Ignores #
-#################
-
-# Precompiled shader bytecode headers
-*.shh
-
-# .obj 3d model files unignore
-!Engine/models/*.obj

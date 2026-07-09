@@ -65,14 +65,12 @@ bool Keyboard::CharIsEmpty() const
 
 void Keyboard::FlushKey()
 {
-	auto rhs = std::queue<Event>();
-	std::swap( keybuffer, rhs);
+	std::swap( keybuffer,std::queue<Event>() );
 }
 
 void Keyboard::FlushChar()
 {
-	auto rhs = std::queue<char>();
-	std::swap( charbuffer, rhs );
+	std::swap( charbuffer,std::queue<char>() );
 }
 
 void Keyboard::Flush()

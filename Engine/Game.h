@@ -21,6 +21,8 @@
 #pragma once
 
 #include "Graphics.h"
+#include "Cube.h"
+#include "ScreenTransformer.h"
 
 class Game
 {
@@ -41,4 +43,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
+	Cube cube;
+	ScreenTransformer st;
 };

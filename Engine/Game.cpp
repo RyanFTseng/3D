@@ -21,10 +21,12 @@
 #include "MainWindow.h"
 #include "Game.h"
 
-Game::Game( MainWindow& wnd )
+
+Game::Game(MainWindow& wnd)
 	:
-	wnd( wnd ),
-	gfx( wnd )
+	wnd(wnd),
+	gfx(wnd),
+	cube(1.0f)
 {
 }
 
@@ -36,10 +38,26 @@ void Game::Go()
 	gfx.EndFrame();
 }
 
+//logic
 void Game::UpdateModel()
 {
 }
 
+
+//visual render
 void Game::ComposeFrame()
 {
+	auto lines = cube.GetLines();
+	for (auto& v : lines.vertices)
+	{
+		v += {0.0f, 0.0f, 1.0f};
+		st.Transform(v);
+	}
+	for (auto i = lines.indices.cbegin(),
+		end = lines.indices.cend();
+		i != end; std::advance(i, 2))
+	{
+		gfx.DrawLine(lines.vertices[*i], lines.vertices[*std::next(i)], Colors::White);
+	}
+
 }

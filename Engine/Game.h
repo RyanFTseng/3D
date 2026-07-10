@@ -23,6 +23,7 @@
 #include "Graphics.h"
 #include "Cube.h"
 #include "ScreenTransformer.h"
+#include "Mat3.h"
 
 class Game
 {
@@ -45,4 +46,9 @@ private:
 	/********************************/
 	Cube cube;
 	ScreenTransformer st;
+	static constexpr float dTheta = PI;
+	float offset_z = 2.0f;
+	float theta_x = 0.0f;
+	float theta_y = 0.0f;
+	float theta_z = 0.0f;
 };

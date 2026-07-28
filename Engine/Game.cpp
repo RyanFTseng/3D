@@ -20,14 +20,17 @@
 ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-
+#include "SolidCubeScene.h"
+#include "CubeOrderScene.h"
 
 Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
-	gfx(wnd),
-	cube(1.0f)
+	gfx(wnd)
 {
+	scenes.push_back(std::make_unique<SolidCubeScene>());
+	scenes.push_back(std::make_unique < CubeOrderScene>());
+	curScene = scenes.begin();
 }
 
 void Game::Go()
@@ -38,81 +41,32 @@ void Game::Go()
 	gfx.EndFrame();
 }
 
-//logic
 void Game::UpdateModel()
 {
 	const float dt = 1.0f / 60.0f;
-	if (wnd.kbd.KeyIsPressed('Q'))
+	// cycle through scenes when tab is pressed
+	while (!wnd.kbd.KeyIsEmpty())
 	{
-		theta_x += wrap_angle(dTheta * dt);
+		const auto e = wnd.kbd.ReadKey();
+		if (e.GetCode() == VK_TAB && e.IsPress())
+		{
+			CycleScenes();
+		}
 	}
-	if (wnd.kbd.KeyIsPressed('W'))
+	// update scene
+	(*curScene)->Update(wnd.kbd, wnd.mouse, dt);
+}
+
+void Game::CycleScenes()
+{
+	if (++curScene == scenes.end())
 	{
-		theta_y += wrap_angle(dTheta * dt);
-	}
-	if (wnd.kbd.KeyIsPressed('E'))
-	{
-		theta_z += wrap_angle(dTheta * dt);
-	}
-	if (wnd.kbd.KeyIsPressed('A'))
-	{
-		theta_x -= wrap_angle(dTheta * dt);
-	}
-	if (wnd.kbd.KeyIsPressed('S'))
-	{
-		theta_y -= wrap_angle(dTheta * dt);
-	}
-	if (wnd.kbd.KeyIsPressed('D'))
-	{
-		theta_z -= wrap_angle(dTheta * dt);
-	}
-	if (wnd.kbd.KeyIsPressed('R'))
-	{
-		offset_z += 2.0f * dt;
-	}
-	if (wnd.kbd.KeyIsPressed('F'))
-	{
-		offset_z -= 2.0f * dt;
+		curScene = scenes.begin();
 	}
 }
 
-
-//visual render
 void Game::ComposeFrame()
 {
-	const Color colors[12] = {
-	Colors::White,
-	Colors::Blue,
-	Colors::Cyan,
-	Colors::Gray,
-	Colors::Green,
-	Colors::Magenta,
-	Colors::LightGray,
-	Colors::Red,
-	Colors::Yellow,
-	Colors::White,
-	Colors::Blue,
-	Colors::Cyan
-	};
-
-
-	auto triangles = cube.GetTriangles();
-	const Mat3 rot =
-		Mat3::RotationX(theta_x) *
-		Mat3::RotationY(theta_y) *
-		Mat3::RotationZ(theta_z);
-	for (auto& v : triangles.vertices)
-	{
-		v *= rot;
-		v += {0.0f, 0.0f, offset_z};
-		st.Transform(v);
-	}
-	//read vertices and match with index
-	for (auto i = triangles.indices.cbegin(),
-		end = triangles.indices.cend();	
-		i != end; std::advance(i, 3))
-	{
-		gfx.DrawTriangle(triangles.vertices[*i], triangles.vertices[*std::next(i)], triangles.vertices[*std::next(i,2)], colors[std::distance(triangles.indices.cbegin(),i)/3]);
-	}
-
+	// draw scene
+	(*curScene)->Draw(gfx);
 }

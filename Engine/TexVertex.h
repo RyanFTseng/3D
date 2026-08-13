@@ -24,7 +24,7 @@ public:
 		tc += rhs.tc;
 		return *this;
 	}
-	TexVertex& operator+(const TexVertex& rhs)
+	TexVertex& operator+(const TexVertex& rhs) const
 	{
 		return TexVertex(*this) += rhs;
 	}
@@ -34,7 +34,7 @@ public:
 		tc -= rhs.tc;
 		return *this;
 	}
-	TexVertex& operator-(const TexVertex& rhs)
+	TexVertex& operator-(const TexVertex& rhs) const
 	{
 		return TexVertex(*this) -= rhs;
 	}
@@ -44,7 +44,7 @@ public:
 		tc *= rhs;
 		return *this;
 	}
-	TexVertex& operator*(float rhs)
+	TexVertex& operator*(float rhs) const
 	{
 		return TexVertex(*this) *= rhs;
 	}
@@ -54,7 +54,7 @@ public:
 		tc /= rhs;
 		return *this;
 	}
-	TexVertex& operator/(float rhs)
+	TexVertex& operator/(float rhs) const
 	{
 		return TexVertex(*this)/ rhs;
 	}

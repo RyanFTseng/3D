@@ -535,49 +535,12 @@ void Graphics::DrawFlatTopTriangleTex(const TexVertex& v0, const TexVertex& v1, 
 	const TexVertex dv0 = (v2 - v0) / delta_y;
 	const TexVertex dv1 = (v2 - v1) / delta_y;
 
-	//create edge interpolants
-	TexVertex itEdge0 = v0;
+	//create right edge interpolant
 	TexVertex itEdge1 = v1;
 
-	// calculate start and end scanlines
-	const int yStart = (int)ceil(v0.pos.y - 0.5f);
-	const int yEnd = (int)ceil(v2.pos.y - 0.5f); // the scanline AFTER the last line drawn
+	DrawFlatTriangleTex(v0, v1, v2, tex, dv0, dv1, itEdge1);
 
-	//do interpolant prestep
-	itEdge0 += dv0 * (float(yStart) + 0.5f - v0.pos.y);
-	itEdge1 += dv1 * (float(yStart) + 0.5f - v0.pos.y);
-
-	// init tex width/height and clamp values
-	const float tex_width = float(tex.GetWidth());
-	const float tex_height = float(tex.GetHeight());
-	const float tex_clamp_x = tex_width - 1.0f;
-	const float tex_clamp_y = tex_height - 1.0f;
-
-
-	//scanline loop
-	for (int y = yStart; y < yEnd; y++, itEdge0 += dv0, itEdge1 +=dv1)
-	{
-
-		// calculate start and end pixels
-		const int xStart = (int)ceil(itEdge0.pos.x - 0.5f);
-		const int xEnd = (int)ceil(itEdge1.pos.x - 0.5f); // the pixel AFTER the last pixel drawn
-
-		// calculate scanline dTexCoord /dx
-		const Vec2 dtcLine = (itEdge1.tc - itEdge0.tc) / (itEdge1.pos.x - itEdge0.pos.x);
-
-		//create scanline tex coord interpolant and prestep
-		Vec2 itcLine = itEdge0.tc + dtcLine * (float(xStart) + 0.5f - itEdge0.pos.x);
-
-		for (int x = xStart; x < xEnd; x++, itcLine += dtcLine)
-		{
-			PutPixel(x, y, tex.GetPixel(
-				//normalized texture coord * texture width/height
-				int(std::min(itcLine.x * tex_width, tex_clamp_x)),
-				int(std::min(itcLine.y * tex_height, tex_clamp_y))));
-			// need std::min b/c tc.x/y == 1.0, we'll read off edge of tex
-			// and with fp err, tc.x/y can be > 1.0 (by a tiny amount)
-		}
-	}
+	
 }
 
 void Graphics::DrawFlatBottomTriangleTex(const TexVertex& v0, const TexVertex& v1, const TexVertex& v2, const Surface& tex)
@@ -588,8 +551,15 @@ void Graphics::DrawFlatBottomTriangleTex(const TexVertex& v0, const TexVertex& v
 	const TexVertex dv1 = (v2 - v0) / delta_y;
 
 	//create edge interpolants
-	TexVertex itEdge0 = v0;
 	TexVertex itEdge1 = v0;
+	
+	DrawFlatTriangleTex(v0, v1, v2, tex, dv0, dv1, itEdge1);
+}
+
+void Graphics::DrawFlatTriangleTex(const TexVertex& v0, const TexVertex& v1, const TexVertex& v2, const Surface& tex, const TexVertex& dv0, const TexVertex& dv1, TexVertex& itEdge1)
+{
+	//create edge interpolants
+	TexVertex itEdge0 = v0;
 
 	// calculate start and end scanlines
 	const int yStart = (int)ceil(v0.pos.y - 0.5f);

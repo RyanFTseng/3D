@@ -8,7 +8,10 @@
 class TexCubeScene : public Scene
 {
 public:
-	TexCubeScene() = default;
+	TexCubeScene()
+		:
+		Scene("Textured Cube")
+	{}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
 		if (kbd.KeyIsPressed('Q'))

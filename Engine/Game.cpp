@@ -23,6 +23,10 @@
 #include "SolidCubeScene.h"
 #include "CubeOrderScene.h"
 #include "TexCubeScene.h"
+#include "FoldedCubeWrapScene.h"
+#include <sstream>
+#include "CubeSkinnedScene.h"
+
 
 Game::Game(MainWindow& wnd)
 	:
@@ -32,7 +36,11 @@ Game::Game(MainWindow& wnd)
 	scenes.push_back(std::make_unique<SolidCubeScene>());
 	scenes.push_back(std::make_unique < CubeOrderScene>());
 	scenes.push_back(std::make_unique<TexCubeScene>());
+	scenes.push_back(std::make_unique<FoldedCubeWrapScene>());
+	scenes.push_back(std::make_unique<CubeSkinnedScene>(L"images\\dice_skin.png"));
+
 	curScene = scenes.begin();
+	OutputSceneName();
 }
 
 void Game::Go()
@@ -54,6 +62,10 @@ void Game::UpdateModel()
 		{
 			CycleScenes();
 		}
+		else if (e.GetCode() == VK_ESCAPE && e.IsPress())
+		{
+			wnd.Kill();
+		}
 	}
 	// update scene
 	(*curScene)->Update(wnd.kbd, wnd.mouse, dt);
@@ -65,6 +77,18 @@ void Game::CycleScenes()
 	{
 		curScene = scenes.begin();
 	}
+	OutputSceneName();
+}
+
+void Game::OutputSceneName() const
+{
+	std::stringstream ss;
+	const std::string stars((*curScene)->GetName().size() + 4, '*');
+
+	ss << stars << std::endl
+		<< "* " << (*curScene)->GetName() << " *" << std::endl
+		<< stars << std::endl;
+	OutputDebugStringA(ss.str().c_str());
 }
 
 void Game::ComposeFrame()

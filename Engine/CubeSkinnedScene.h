@@ -1,16 +1,17 @@
 #pragma once
 
 #include "Scene.h"
-#include "Cube.h"
+#include "CubeSkinned.h"
 #include "ScreenTransformer.h"
 #include "Mat3.h"
 
-class SolidCubeScene : public Scene
+class CubeSkinnedScene : public Scene
 {
 public:
-	SolidCubeScene()
+	CubeSkinnedScene(const std::wstring& filename)
 		:
-		Scene("Solid Cube")
+		Scene("Skinned Cube Tex: " + std::string(filename.begin(), filename.end())),
+		sbTex(Surface::FromFile(filename))
 	{}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
@@ -49,8 +50,9 @@ public:
 	}
 	virtual void Draw(Graphics& gfx) const override
 	{
+		// NOTE: Changes had to be made because of Vec3 -> TexVertex
 		// generate indexed triangle list
-		auto triangles = cube.GetTriangles();
+		auto triangles = cube.GetTrianglesTex();
 		// generate rotation matrix from euler angles
 		const Mat3 rot =
 			Mat3::RotationX(theta_x) *
@@ -59,23 +61,23 @@ public:
 		// transform from model space -> world (/view) space
 		for (auto& v : triangles.vertices)
 		{
-			v *= rot;
-			v += { 0.0f, 0.0f, offset_z };
+			v.pos *= rot;
+			v.pos += { 0.0f, 0.0f, offset_z };
 		}
 		// backface culling test (must be done in world (/view) space)
 		for (size_t i = 0,
 			end = triangles.indices.size() / 3;
 			i < end; i++)
 		{
-			const Vec3& v0 = triangles.vertices[triangles.indices[i * 3]];
-			const Vec3& v1 = triangles.vertices[triangles.indices[i * 3 + 1]];
-			const Vec3& v2 = triangles.vertices[triangles.indices[i * 3 + 2]];
+			const Vec3& v0 = triangles.vertices[triangles.indices[i * 3]].pos;
+			const Vec3& v1 = triangles.vertices[triangles.indices[i * 3 + 1]].pos;
+			const Vec3& v2 = triangles.vertices[triangles.indices[i * 3 + 2]].pos;
 			triangles.cullFlags[i] = (v1 - v0) % (v2 - v0) * v0 > 0.0f;
 		}
 		// transform to screen space (includes perspective transform)
 		for (auto& v : triangles.vertices)
 		{
-			st.Transform(v);
+			st.Transform(v.pos);
 		}
 		// draw the mf triangles!
 		for (size_t i = 0,
@@ -85,31 +87,18 @@ public:
 			// skip triangles previously determined to be back-facing
 			if (!triangles.cullFlags[i])
 			{
-				gfx.DrawTriangle(
+				gfx.DrawTriangleTex(
 					triangles.vertices[triangles.indices[i * 3]],
 					triangles.vertices[triangles.indices[i * 3 + 1]],
 					triangles.vertices[triangles.indices[i * 3 + 2]],
-					colors[i]);
+					sbTex);
 			}
 		}
 	}
 private:
 	ScreenTransformer st;
-	Cube cube = Cube(1.0f);
-	static constexpr Color colors[12] = {
-		Colors::White,
-		Colors::Blue,
-		Colors::Cyan,
-		Colors::Gray,
-		Colors::Green,
-		Colors::Magenta,
-		Colors::LightGray,
-		Colors::Red,
-		Colors::Yellow,
-		Colors::White,
-		Colors::Blue,
-		Colors::Cyan
-	};
+	CubeSkinned cube = CubeSkinned(1.0f);
+	Surface sbTex;
 	static constexpr float dTheta = PI;
 	float offset_z = 2.0f;
 	float theta_x = 0.0f;

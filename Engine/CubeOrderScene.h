@@ -8,7 +8,10 @@
 class CubeOrderScene : public Scene
 {
 public:
-	CubeOrderScene() = default;
+	CubeOrderScene()
+		:
+		Scene("Cube Order")
+	{}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
 		if (kbd.KeyIsPressed('Q'))

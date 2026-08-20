@@ -12,6 +12,7 @@ public:
 	CubeSkinned(float size)
 	{
 		const float side = size / 2.0f;
+		//get texture space vertex coords
 		const auto ConvertTexCoord = [](float u, float v)
 			{
 				return Vec2{ (u + 1.0f) / 3.0f,v / 4.0f };

@@ -18,19 +18,21 @@ public:
 	{
 	public:
 		Vertex() = default;
-		Vertex( const Vec3& pos)
+		Vertex(const Vec3& pos)
 			:
 			pos(pos)
 		{}
+		// this enables template functions clone a vertex
+		// while changing the pos only
 		Vertex(const Vec3& pos, const Vertex& src)
 			:
-			pos(pos),
-			t(src.t)
+			t(src.t),
+			pos(pos)
 		{}
 		Vertex(const Vec3& pos, const Vec2& t)
 			:
-			pos(pos),
-			t(t)
+			t(t),
+			pos(pos)
 		{}
 		Vertex& operator+=(const Vertex& rhs)
 		{
@@ -38,7 +40,7 @@ public:
 			t += rhs.t;
 			return *this;
 		}
-		Vertex& operator+(const Vertex& rhs) const
+		Vertex operator+(const Vertex& rhs) const
 		{
 			return Vertex(*this) += rhs;
 		}
@@ -48,17 +50,17 @@ public:
 			t -= rhs.t;
 			return *this;
 		}
-		Vertex& operator-(const Vertex& rhs) const
+		Vertex operator-(const Vertex& rhs) const
 		{
 			return Vertex(*this) -= rhs;
 		}
-		Vertex& operator*=( float rhs)
+		Vertex& operator*=(float rhs)
 		{
 			pos *= rhs;
 			t *= rhs;
 			return *this;
 		}
-		Vertex& operator*(float rhs) const
+		Vertex operator*(float rhs) const
 		{
 			return Vertex(*this) *= rhs;
 		}
@@ -68,36 +70,35 @@ public:
 			t /= rhs;
 			return *this;
 		}
-		Vertex& operator/(float rhs) const
+		Vertex operator/(float rhs) const
 		{
 			return Vertex(*this) /= rhs;
 		}
-
-
+	public:
 		Vec3 pos;
 		Vec2 t;
 	};
 
 public:
-	Pipeline(Graphics& gfx)
+	Pipeline( Graphics& gfx )
 		:
-		gfx(gfx)
+		gfx( gfx )
 	{}
-	void Draw(IndexedTriangleList<Vertex>& triList)
+	void Draw( IndexedTriangleList<Vertex>& triList )
 	{
-		ProcessVertices(triList.vertices, triList.indices);
+		ProcessVertices( triList.vertices,triList.indices );
 	}
-	void BindRotation(const Mat3& rotation_in)
+	void BindRotation( const Mat3& rotation_in )
 	{
 		rotation = rotation_in;
 	}
-	void BindTranslation(const Vec3& translation_in)
+	void BindTranslation( const Vec3& translation_in )
 	{
 		translation = translation_in;
 	}
-	void BindTexture(const std::wstring& filename)
+	void BindTexture( const std::wstring& filename )
 	{
-		pTex = std::make_unique<Surface>(Surface::FromFile(filename));
+		pTex = std::make_unique<Surface>( Surface::FromFile( filename ) );
 	}
 
 private:
@@ -105,16 +106,16 @@ private:
 	//transforms vertices and passes vtx and idx lists to triangle assembler
 	void ProcessVertices(const std::vector<Vertex>& vertices, const std::vector<size_t>& indices)
 	{
-		//create vertex vector for vs output
+		// create vertex vector for vs output
 		std::vector<Vertex> verticesOut;
 
-		//transform vertices w matrix + vector
+		// transform vertices using matrix + vector
 		for (const auto& v : vertices)
 		{
 			verticesOut.emplace_back(v.pos * rotation + translation, v.t);
 		}
 
-		//assemble triangles using indices and vertices
+		// assemble triangles from stream of indices and vertices
 		AssembleTriangles(verticesOut, indices);
 	}
 
@@ -129,7 +130,7 @@ private:
 			//determine triangle face using indices
 			const auto& v0 = vertices[indices[i * 3]];
 			const auto& v1 = vertices[indices[i * 3 + 1]];
-			const auto& v2 = vertices[indices[i * 3 + 1]];
+			const auto& v2 = vertices[indices[i * 3 + 2]];
 
 			//cull backfacing triangles using cross product(%)
 			if ((v1.pos - v0.pos) % (v2.pos - v0.pos) *v0.pos <= 0.0f)
@@ -218,7 +219,7 @@ private:
 		const Vertex& it1,
 		const Vertex& it2)
 	{
-		// calulcate dVertex / dy
+		// calculcate dVertex / dy
 		// change in interpolant for every 1 change in y
 		const float delta_y = it2.pos.y - it0.pos.y;
 		const auto dit0 = (it2 - it0) / delta_y;
@@ -295,8 +296,8 @@ private:
 			{
 				// perform texture lookup, clamp, and write pixel
 				gfx.PutPixel(x, y, pTex->GetPixel(
-					(unsigned int)min(iLine.t.x * tex_width + 0.5f, tex_xclamp),
-					(unsigned int)min(iLine.t.y * tex_height + 0.5f, tex_yclamp)
+					(unsigned int)std::min(iLine.t.x * tex_width + 0.5f, tex_xclamp),
+					(unsigned int)std::min(iLine.t.y * tex_height + 0.5f, tex_yclamp)
 				));
 			}
 		}

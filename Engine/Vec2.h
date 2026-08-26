@@ -124,10 +124,7 @@ public:
 	{
 		return !(*this == rhs);
 	}
-	_Vec2 InterpolateTo(const _Vec2& dest, T alpha) const
-	{
-		return *this + (dest - *this) * alpha;
-	}
+	
 public:
 	T x;
 	T y;

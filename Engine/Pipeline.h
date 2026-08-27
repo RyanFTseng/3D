@@ -11,73 +11,12 @@
 
 
 //triangle pipeline
+//pixel shading stage
+template <class Effect> 
 class Pipeline
 {
 public:
-	class Vertex
-	{
-	public:
-		Vertex() = default;
-		Vertex(const Vec3& pos)
-			:
-			pos(pos)
-		{}
-		// this enables template functions clone a vertex
-		// while changing the pos only
-		Vertex(const Vec3& pos, const Vertex& src)
-			:
-			t(src.t),
-			pos(pos)
-		{}
-		Vertex(const Vec3& pos, const Vec2& t)
-			:
-			t(t),
-			pos(pos)
-		{}
-		Vertex& operator+=(const Vertex& rhs)
-		{
-			pos += rhs.pos;
-			t += rhs.t;
-			return *this;
-		}
-		Vertex operator+(const Vertex& rhs) const
-		{
-			return Vertex(*this) += rhs;
-		}
-		Vertex& operator-=(const Vertex& rhs)
-		{
-			pos -= rhs.pos;
-			t -= rhs.t;
-			return *this;
-		}
-		Vertex operator-(const Vertex& rhs) const
-		{
-			return Vertex(*this) -= rhs;
-		}
-		Vertex& operator*=(float rhs)
-		{
-			pos *= rhs;
-			t *= rhs;
-			return *this;
-		}
-		Vertex operator*(float rhs) const
-		{
-			return Vertex(*this) *= rhs;
-		}
-		Vertex& operator/=(float rhs)
-		{
-			pos /= rhs;
-			t /= rhs;
-			return *this;
-		}
-		Vertex operator/(float rhs) const
-		{
-			return Vertex(*this) /= rhs;
-		}
-	public:
-		Vec3 pos;
-		Vec2 t;
-	};
+	typedef typename Effect::Vertex Vertex;
 
 public:
 	Pipeline( Graphics& gfx )
@@ -96,10 +35,7 @@ public:
 	{
 		translation = translation_in;
 	}
-	void BindTexture( const std::wstring& filename )
-	{
-		pTex = std::make_unique<Surface>( Surface::FromFile( filename ) );
-	}
+	
 
 private:
 	//vertex processing
@@ -268,11 +204,6 @@ private:
 		itEdge0 += dv0 * (float(yStart) + 0.5f - it0.pos.y);
 		itEdge1 += dv1 * (float(yStart) + 0.5f - it0.pos.y);
 
-		// prepare clamping constants
-		const float tex_width = float(pTex->GetWidth());
-		const float tex_height = float(pTex->GetHeight());
-		const float tex_xclamp = tex_width - 1.0f;
-		const float tex_yclamp = tex_height - 1.0f;
 
 		for (int y = yStart; y < yEnd; y++, itEdge0 += dv0, itEdge1 += dv1)
 		{
@@ -294,19 +225,18 @@ private:
 
 			for (int x = xStart; x < xEnd; x++, iLine += diLine)
 			{
-				// perform texture lookup, clamp, and write pixel
-				gfx.PutPixel(x, y, pTex->GetPixel(
-					(unsigned int)std::min(iLine.t.x * tex_width + 0.5f, tex_xclamp),
-					(unsigned int)std::min(iLine.t.y * tex_height + 0.5f, tex_yclamp)
-				));
+				//invoke pixel shader and write color value
+				gfx.PutPixel(x, y, effect.ps(iLine)	);
 			}
 		}
 	}
 
-private:
-	Graphics& gfx;
-	ScreenTransformer st;
-	Mat3 rotation;
-	Vec3 translation;
-	std::unique_ptr<Surface> pTex;
+
+	public: 
+		Effect effect;
+	private:
+		Graphics& gfx;
+		ScreenTransformer st;
+		Mat3 rotation;
+		Vec3 translation;
 };

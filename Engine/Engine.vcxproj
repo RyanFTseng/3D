@@ -159,6 +159,7 @@
     <ClInclude Include="scene.h" />
     <ClInclude Include="ScreenTransformer.h" />
     <ClInclude Include="Surface.h" />
+    <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />

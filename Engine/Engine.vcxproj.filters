@@ -99,6 +99,12 @@
     <ClInclude Include="TextureEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VertexColorEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeVertexColorScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

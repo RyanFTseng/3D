@@ -159,6 +159,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="ScreenTransformer.h" />
+    <ClInclude Include="SolidEffect.h" />
     <ClInclude Include="Surface.h" />
     <ClInclude Include="TextureEffect.h" />
     <ClInclude Include="Triangle.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="VertexColorEffect.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CubeSolidScene.h" />
     <ClCompile Include="DXErr.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
     <ClCompile Include="Game.cpp" />

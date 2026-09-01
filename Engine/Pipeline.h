@@ -94,9 +94,9 @@ private:
 	void PostProcessTriangleVertices(Triangle<Vertex>& triangle)
 	{
 		//perspective divide and screen transform for all 3 vertices
-		st.Transform(triangle.v0.pos);
-		st.Transform(triangle.v1.pos);
-		st.Transform(triangle.v2.pos);
+		st.Transform(triangle.v0);
+		st.Transform(triangle.v1);
+		st.Transform(triangle.v2);
 
 		//draw the triangle
 		DrawTriangle(triangle);
@@ -225,8 +225,16 @@ private:
 
 			for (int x = xStart; x < xEnd; x++, iLine += diLine)
 			{
+
+				//recover interpolated z from interpolated 1/z
+				//flip 1/z to get z
+				const float z = 1.0f / iLine.pos.z;
+				//recover interpolated attributes
+				//multiply all attributes in vertex by z
+				//attr z is currently 1/z
+				const auto attr = iLine * z;
 				//invoke pixel shader and write color value
-				gfx.PutPixel(x, y, effect.ps(iLine)	);
+				gfx.PutPixel(x, y, effect.ps(attr)	);
 			}
 		}
 	}

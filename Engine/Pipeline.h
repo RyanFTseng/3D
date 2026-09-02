@@ -7,6 +7,7 @@
 #include "Triangle.h"
 #include "IndexedTriangleList.h"
 #include "Mat3.h"
+#include "ZBuffer.h"
 
 
 
@@ -21,7 +22,9 @@ public:
 public:
 	Pipeline( Graphics& gfx )
 		:
-		gfx( gfx )
+		gfx( gfx ),
+		zb(gfx.ScreenWidth, gfx.ScreenHeight)
+
 	{}
 	void Draw( IndexedTriangleList<Vertex>& triList )
 	{
@@ -35,7 +38,10 @@ public:
 	{
 		translation = translation_in;
 	}
-	
+	void BeginFrame()
+	{
+		zb.Clear();
+	}
 
 private:
 	//vertex processing
@@ -186,6 +192,7 @@ private:
 	}
 	// does processing common to both flat top and flat bottom tris
 	// texture lookup and pixel written here
+	//perform depth culling
 	void DrawFlatTriangle(const Vertex& it0,
 		const Vertex& it1,
 		const Vertex& it2,
@@ -229,12 +236,16 @@ private:
 				//recover interpolated z from interpolated 1/z
 				//flip 1/z to get z
 				const float z = 1.0f / iLine.pos.z;
-				//recover interpolated attributes
-				//multiply all attributes in vertex by z
-				//attr z is currently 1/z
-				const auto attr = iLine * z;
-				//invoke pixel shader and write color value
-				gfx.PutPixel(x, y, effect.ps(attr)	);
+				if (zb.TestAndSet(x, y, z))
+				{
+					//recover interpolated attributes
+					//multiply all attributes in vertex by z
+					//attr z is currently 1/z
+					const auto attr = iLine * z;
+					//invoke pixel shader and write color value
+					gfx.PutPixel(x, y, effect.ps(attr));
+				}
+				
 			}
 		}
 	}
@@ -244,6 +255,7 @@ private:
 		Effect effect;
 	private:
 		Graphics& gfx;
+		ZBuffer zb;
 		ScreenTransformer st;
 		Mat3 rotation;
 		Vec3 translation;

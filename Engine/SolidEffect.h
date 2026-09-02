@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Pipeline.h"
+#include "DefaultVertexShader.h"
 
-// basic texture effect
+// solid color attribute not interpolated
 class SolidEffect
 {
 public:
@@ -20,7 +21,7 @@ public:
 			color(src.color),
 			pos(pos)
 		{}
-		Vertex(const Vec3& pos, const Vec2& t)
+		Vertex(const Vec3& pos, const Color& color)
 			:
 			color(color),
 			pos(pos)
@@ -65,21 +66,23 @@ public:
 		Vec3 pos;
 		Color color;
 	};
-
-	//invoked for each pixel of triangle
-	//takes input of attributes
-	//that are the result of interpolating vector attributes
-	//outputs color
+	// default vs rotates and translates vertices
+	// does not touch attributes
+	typedef DefaultVertexShader<Vertex> VertexShader;
+	// invoked for each pixel of a triangle
+	// takes an input of attributes that are the
+	// result of interpolating vertex attributes
+	// and outputs a color
 	class PixelShader
 	{
 	public:
 		template<class I>
 		Color operator()(const I& in) const
 		{
-			return Color(in.color);
+			return in.color;
 		}
 	};
 public:
+	VertexShader vs;
 	PixelShader ps;
-
 };

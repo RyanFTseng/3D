@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Pipeline.h"
+#include "DefaultVertexShader.h"
 #include <algorithm>
+
 
 // basic texture effect
 class VertexColorEffect
@@ -75,6 +77,8 @@ public:
 	//takes input of attributes
 	//that are the result of interpolating vector attributes
 	//outputs color
+	typedef DefaultVertexShader<Vertex> VertexShader;
+
 	class PixelShader
 	{
 	public:
@@ -86,5 +90,7 @@ public:
 	};
 public:
 	PixelShader ps;
+	VertexShader vs;
+
 
 };

@@ -4,7 +4,6 @@
 #include "Plane.h"
 #include <cmath>
 
-// solid color attribute not interpolated
 class WaveTextureEffect
 {
 public:
@@ -19,7 +18,9 @@ public:
 		{}
 		Vertex(const Vec3& pos, const Vertex& src)
 			:
+			//texture coordinate
 			t(src.t),
+			//world position
 			pos(pos)
 		{}
 		Vertex(const Vec3& pos, const Vec2& t)
@@ -67,8 +68,8 @@ public:
 		Vec3 pos;
 		Vec2 t;
 	};
-	// default vs rotates and translates vertices
-	// does not touch attributes
+
+
 	class VertexShader
 	{
 	public:
@@ -88,7 +89,7 @@ public:
 			Vec3 pos = in.pos * rotation + translation;
 			//wave function
 			pos.y += amplitude * std::sin(time * freqScroll + pos.x * freqWave);
-			return { pos, in.t };
+			return { pos, in.t};
 		}
 		void SetTime(float t)
 		{
@@ -104,10 +105,8 @@ public:
 		
 
 	};
-	// invoked for each pixel of a triangle
-	// takes an input of attributes that are the
-	// result of interpolating vertex attributes
-	// and outputs a color
+	
+	
 	class PixelShader
 	{
 	public:

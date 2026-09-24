@@ -48,6 +48,7 @@ private:
 
 		// transform vertices using vertex shader
 		//run effect.vs functor on all vertices and store in verticesOut
+		//~effect.vs(vertices[i]) -> verticesOut[i]
 		std::transform(vertices.begin(), vertices.end(), verticesOut.begin(), effect.vs);
 		
 		// assemble triangles from stream of indices and vertices

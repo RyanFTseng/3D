@@ -81,7 +81,7 @@
     <ClInclude Include="IndexedTriangleList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scene.h">
+    <ClInclude Include="Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pipeline.h">
@@ -121,6 +121,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VertexWaveScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultGeometryShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SolidGeometryEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeSolidGeometryScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include "Pipeline.h"
 #include "DefaultVertexShader.h"
 #include <algorithm>
+#include "DefaultGeometryShader.h"
 
 
 // basic texture effect
@@ -78,6 +79,7 @@ public:
 	//that are the result of interpolating vector attributes
 	//outputs color
 	typedef DefaultVertexShader<Vertex> VertexShader;
+	typedef DefaultGeometryShader<VertexShader::Output> GeometryShader;
 
 	class PixelShader
 	{
@@ -91,6 +93,6 @@ public:
 public:
 	PixelShader ps;
 	VertexShader vs;
-
+	GeometryShader gs;
 
 };

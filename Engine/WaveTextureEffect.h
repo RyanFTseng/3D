@@ -3,10 +3,12 @@
 #include "Pipeline.h"
 #include "Plane.h"
 #include <cmath>
+#include "DefaultGeometryShader.h"
 
 class WaveTextureEffect
 {
 public:
+
 	// the vertex type that will be input into the pipeline
 	class Vertex
 	{
@@ -106,7 +108,7 @@ public:
 
 	};
 	
-	
+	typedef DefaultGeometryShader<VertexShader::Output> GeometryShader;
 	class PixelShader
 	{
 	public:
@@ -136,5 +138,6 @@ public:
 public:
 	VertexShader vs;
 	PixelShader ps;
+	GeometryShader gs;
 
 };

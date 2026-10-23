@@ -132,6 +132,12 @@
     <ClInclude Include="CubeSolidGeometryScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CubeFlatIndependentScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexFlatEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

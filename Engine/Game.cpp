@@ -25,6 +25,7 @@
 #include "CubeSolidScene.h"
 #include "VertexWaveScene.h"
 #include "CubeSolidGeometryScene.h"
+#include "CubeFlatIndependentScene.h"
 #include <sstream>
 
 Game::Game(MainWindow& wnd)
@@ -37,6 +38,8 @@ Game::Game(MainWindow& wnd)
 	scenes.push_back(std::make_unique<CubeSolidScene>(gfx));
 	scenes.push_back(std::make_unique<VertexWaveScene>(gfx));
 	scenes.push_back(std::make_unique<CubeSolidGeometryScene>(gfx));
+	scenes.push_back(std::make_unique<CubeFlatIndependentScene>(gfx));
+
 
 	curScene = scenes.begin();
 	OutputSceneName();

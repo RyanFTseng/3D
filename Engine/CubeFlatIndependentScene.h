@@ -12,9 +12,9 @@ public:
 	typedef Pipeline<VertexFlatEffect> Pipeline;
 	typedef Pipeline::Vertex Vertex;
 public:
-	CubeFlatIndependentScene(Graphics& gfx)
+	CubeFlatIndependentScene(Graphics& gfx, IndexedTriangleList<Vertex> tl)
 		:
-		itlist(Cube::GetIndependentFacesNormals<Vertex>()),
+		itlist(std::move(tl)),
 		pipeline(gfx),
 		Scene("Cube flat vertex scene")
 	{}

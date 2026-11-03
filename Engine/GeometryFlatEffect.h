@@ -133,14 +133,15 @@ public:
 		//generate shader output
 		Triangle<Output> operator()(const VertexShader::Output& in0, const VertexShader::Output& in1, const VertexShader::Output& in2, size_t triangle_index) const
 		{
-			//calc face normal
-
+			//calc face normal with vertex cross product
+			const auto n = ((in1.pos - in0.pos) % (in2.pos - in0.pos)).GetNormalized();
 			//calc light intensity
-
+			const auto d = diffuse * (std::max)(0.0f, -n * dir);
 			//add difuse + ambient lighting, filter by material color, saturate, and scale
-
+			const auto c = Color(color.GetHadamard(d + ambient).Saturate() * 255.0f);
 			//return triangle
-
+			return{ {in0.pos, c }, {in1.pos, c } , {in2.pos, c } };
+			
 		}
 		void SetDiffuseLight(const Vec3& c)
 		{

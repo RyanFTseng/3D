@@ -5,6 +5,7 @@
 #include "tiny_obj_loader.h"
 #include <fstream>
 #include <cctype>
+#include "Miniball.h"
 
 template<class T>
 class IndexedTriangleList
@@ -38,7 +39,9 @@ public:
 
 		// these will be filled by obj loading function
 		using namespace tinyobj;
+		//vertex data
 		attrib_t attrib;
+		//index data
 		std::vector<shape_t> shapes;
 		std::string err;
 
@@ -75,6 +78,7 @@ public:
 		tl.indices.reserve(mesh.indices.size());
 		for (size_t f = 0; f < mesh.num_face_vertices.size(); f++)
 		{
+			//check if the mesh uses triangles
 			if (mesh.num_face_vertices[f] != 3u)
 			{
 				std::stringstream ss;
@@ -98,6 +102,44 @@ public:
 
 		return tl;
 	}
+	void AdjustToCenter()
+	{
+		// used to enable miniball to access vertex pos info
+		struct VertexAccessor
+		{
+			typedef std::vector<T>::const_iterator Pit;
+			typedef const float* Cit;
+			Cit operator()(Pit it) const
+			{
+				return &it->pos.x;
+			}
+		};
+
+		// solve the minimum bounding sphere
+		Miniball::Miniball<VertexAccessor> mb(3, vertices.cbegin(), vertices.cend());
+		// result is a pointer to float[3] 
+		const auto pc = mb.center();
+		const Vec3 center = { *pc,*std::next(pc),*std::next(pc,2) };
+		// adjust all vertices so that center of minimal sphere is at 0,0
+		for (auto& v : vertices)
+		{
+			v.pos -= center;
+		}
+	}
+
+	//find vertex with max distance from (0,0)
+	float GetRadius() const
+	{
+		return std::max_element(vertices.begin(), vertices.end(),
+			//lamda function ***
+			[](const T& v0, const T& v1)
+			{
+				return v0.pos.LenSq() < v1.pos.LenSq();
+			}
+			//***
+		)->pos.Len();
+	}
+
 	std::vector<T> vertices;
 	std::vector<size_t> indices;
 };

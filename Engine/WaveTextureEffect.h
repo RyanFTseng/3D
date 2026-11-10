@@ -1,15 +1,11 @@
 #pragma once
 
 #include "Pipeline.h"
-#include "Plane.h"
-#include <cmath>
 #include "DefaultGeometryShader.h"
 
 class WaveTextureEffect
 {
 public:
-
-	// the vertex type that will be input into the pipeline
 	class Vertex
 	{
 	public:
@@ -20,9 +16,7 @@ public:
 		{}
 		Vertex(const Vec3& pos, const Vertex& src)
 			:
-			//texture coordinate
 			t(src.t),
-			//world position
 			pos(pos)
 		{}
 		Vertex(const Vec3& pos, const Vec2& t)
@@ -33,6 +27,7 @@ public:
 		Vertex& operator+=(const Vertex& rhs)
 		{
 			pos += rhs.pos;
+			t += rhs.t;
 			return *this;
 		}
 		Vertex operator+(const Vertex& rhs) const
@@ -42,6 +37,7 @@ public:
 		Vertex& operator-=(const Vertex& rhs)
 		{
 			pos -= rhs.pos;
+			t -= rhs.t;
 			return *this;
 		}
 		Vertex operator-(const Vertex& rhs) const
@@ -51,6 +47,7 @@ public:
 		Vertex& operator*=(float rhs)
 		{
 			pos *= rhs;
+			t *= rhs;
 			return *this;
 		}
 		Vertex operator*(float rhs) const
@@ -60,6 +57,7 @@ public:
 		Vertex& operator/=(float rhs)
 		{
 			pos /= rhs;
+			t /= rhs;
 			return *this;
 		}
 		Vertex operator/(float rhs) const
@@ -68,10 +66,11 @@ public:
 		}
 	public:
 		Vec3 pos;
+		//texture position
 		Vec2 t;
 	};
-
-
+	// perturbes vertices in y axis in sin wave based on
+	// x position and time
 	class VertexShader
 	{
 	public:
@@ -87,11 +86,9 @@ public:
 		}
 		Output operator()(const Vertex& in) const
 		{
-			//transform to world space
 			Vec3 pos = in.pos * rotation + translation;
-			//wave function
 			pos.y += amplitude * std::sin(time * freqScroll + pos.x * freqWave);
-			return { pos, in.t};
+			return{ pos,in.t };
 		}
 		void SetTime(float t)
 		{
@@ -100,25 +97,126 @@ public:
 	private:
 		Mat3 rotation;
 		Vec3 translation;
-		float amplitude =0.05f;
 		float time = 0.0f;
-		float freqScroll =5.0f;
 		float freqWave = 10.0f;
-		
-
+		float freqScroll = 5.0f;
+		float amplitude = 0.05f;
 	};
-	
-	typedef DefaultGeometryShader<VertexShader::Output> GeometryShader;
+	// calculate lighting intensity based on light direction
+	// and a face normal computed from geometry with cross product
+	class GeometryShader
+	{
+	public:
+		class Output
+		{
+		public:
+			Output() = default;
+			Output(const Vec3& pos)
+				:
+				pos(pos)
+			{}
+			Output(const Vec3& pos, const Output& src)
+				:
+				t(src.t),
+				l(src.l),
+				pos(pos)
+			{}
+			Output(const Vec3& pos, const Vec2& t, float l)
+				:
+				t(t),
+				l(l),
+				pos(pos)
+			{}
+			Output& operator+=(const Output& rhs)
+			{
+				pos += rhs.pos;
+				t += rhs.t;
+				return *this;
+			}
+			Output operator+(const Output& rhs) const
+			{
+				return Output(*this) += rhs;
+			}
+			Output& operator-=(const Output& rhs)
+			{
+				pos -= rhs.pos;
+				t -= rhs.t;
+				return *this;
+			}
+			Output operator-(const Output& rhs) const
+			{
+				return Output(*this) -= rhs;
+			}
+			Output& operator*=(float rhs)
+			{
+				pos *= rhs;
+				t *= rhs;
+				return *this;
+			}
+			Output operator*(float rhs) const
+			{
+				return Output(*this) *= rhs;
+			}
+			Output& operator/=(float rhs)
+			{
+				pos /= rhs;
+				t /= rhs;
+				return *this;
+			}
+			Output operator/(float rhs) const
+			{
+				return Output(*this) /= rhs;
+			}
+		public:
+			Vec3 pos;
+			//texture position from vertex class defined above
+			Vec2 t;
+			//light intensity appended by shader operation
+			float l;
+		};
+	public:
+		Triangle<Output> operator()(const VertexShader::Output& in0, const VertexShader::Output& in1, const VertexShader::Output& in2, size_t triangle_index) const
+		{
+			// calculate face normal
+			const auto n = ((in1.pos - in0.pos) % (in2.pos - in0.pos)).GetNormalized();
+			// calculate intensity based on angle of incidence plus ambient and saturate
+			const auto l = std::min(1.0f, diffuse * std::max(0.0f, -n * dir) + ambient);
+			//append light intensity
+			return{ { in0.pos,in0.t,l },{ in1.pos,in1.t,l },{ in2.pos,in2.t,l } };
+		}
+		void SetDiffuseLight(float d)
+		{
+			diffuse = d;
+		}
+		void SetAmbientLight(float a)
+		{
+			ambient = a;
+		}
+		void SetLightDirection(const Vec3& dl)
+		{
+			assert(dl.LenSq() >= 0.001f);
+			dir = dl.GetNormalized();
+		}
+	private:
+		Mat3 rotation;
+		Vec3 translation;
+		Vec3 dir = { 0.0f,0.0f,1.0f };
+		float diffuse = 1.0f;
+		float ambient = 0.15f;
+	};
+	// texture clamped ps with light intensity input
 	class PixelShader
 	{
 	public:
-		template<class I>
-		Color operator()(const I& in) const
+		template<class Input>
+		Color operator()(const Input& in) const
 		{
-			return pTex->GetPixel(
+			//use light intensity appended by geometry shader to shade pixel (multiply)
+			const Vec3 color = Vec3(pTex->GetPixel(
 				(unsigned int)std::min(in.t.x * tex_width + 0.5f, tex_xclamp),
 				(unsigned int)std::min(in.t.y * tex_height + 0.5f, tex_yclamp)
-			);
+			));
+			return Color(color * in.l);
 		}
 		void BindTexture(const std::wstring& filename)
 		{
@@ -137,7 +235,6 @@ public:
 	};
 public:
 	VertexShader vs;
-	PixelShader ps;
 	GeometryShader gs;
-
+	PixelShader ps;
 };

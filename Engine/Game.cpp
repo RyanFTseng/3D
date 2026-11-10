@@ -34,12 +34,12 @@ Game::Game(MainWindow& wnd)
 	wnd(wnd),
 	gfx(wnd)
 {
+	scenes.push_back(std::make_unique<VertexWaveScene>(gfx));
 	scenes.push_back(std::make_unique<GeometryFlatScene>(gfx,
 		IndexedTriangleList<GeometryFlatScene::Vertex>::Load("models\\bunny.obj")));
 	scenes.push_back(std::make_unique<CubeSkinScene>(gfx, L"images\\dice_skin.png"));
 	scenes.push_back(std::make_unique<CubeVertexColorScene>(gfx));
 	scenes.push_back(std::make_unique<CubeSolidScene>(gfx));
-	scenes.push_back(std::make_unique<VertexWaveScene>(gfx));
 	scenes.push_back(std::make_unique<CubeSolidGeometryScene>(gfx));
 	//scenes.push_back(std::make_unique<CubeFlatIndependentScene>(gfx));
 

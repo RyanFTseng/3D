@@ -147,6 +147,9 @@
     <ClInclude Include="Miniball.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShrinkEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">

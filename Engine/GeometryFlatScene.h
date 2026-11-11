@@ -19,7 +19,7 @@ public:
 		Scene("flat geometry scene free mesh")
 	{
 		itlist.AdjustToCenter();
-		offset_z = itlist.GetRadius() * 1.6f;
+		offset_z = itlist.GetRadius() * 5.0f;
 	}
 	virtual void Update(Keyboard& kbd, Mouse& mouse, float dt) override
 	{
@@ -79,6 +79,7 @@ public:
 		{
 			offset_z -= 0.2f * dt;
 		}
+		time += dt;
 	}
 	virtual void Draw() override
 	{
@@ -97,6 +98,7 @@ public:
 		// set pipeline transform
 		pipeline.effect.vs.BindRotation(rot);
 		pipeline.effect.vs.BindTranslation(trans);
+		pipeline.effect.vs.SetTime(time);
 		pipeline.effect.gs.SetLightDirection(light_dir * rot_phi);
 		// render triangles
 		pipeline.Draw(itlist);
@@ -112,5 +114,6 @@ private:
 	float phi_x = 0.0f;
 	float phi_y = 0.0f;
 	float phi_z = 0.0f;
+	float time = 0.0f;
 	Vec3 light_dir = { 0.2f,-0.5f,1.0f };
 };

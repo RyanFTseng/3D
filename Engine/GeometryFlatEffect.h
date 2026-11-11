@@ -64,7 +64,37 @@ public:
 	public:
 		Vec3 pos;
 	};
-	typedef DefaultVertexShader<Vertex> VertexShader;
+	class VertexShader
+	{
+	public:
+		typedef Vertex Output;
+	public:
+		void BindRotation(const Mat3& rotation_in)
+		{
+			rotation = rotation_in;
+		}
+		void BindTranslation(const Vec3& translation_in)
+		{
+			translation = translation_in;
+		}
+		Output operator()(const Vertex& in) const
+		{
+			Vec3 pos = in.pos * rotation + translation;
+			pos.y += amplitude * std::sin(time * freqScroll + pos.x * freqWave);
+			return{ pos };
+		}
+		void SetTime(float t)
+		{
+			time = t;
+		}
+	private:
+		Mat3 rotation;
+		Vec3 translation;
+		float time = 0.0f;
+		float freqWave = 10.0f;
+		float freqScroll = 5.0f;
+		float amplitude = 0.05f;
+	};
 
 	class GeometryShader
 	{

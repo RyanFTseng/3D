@@ -166,6 +166,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ScreenTransformer.h" />
+    <ClInclude Include="ShrinkEffect.h" />
     <ClInclude Include="SolidEffect.h" />
     <ClInclude Include="SolidGeometryEffect.h" />
     <ClInclude Include="Surface.h" />

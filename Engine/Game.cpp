@@ -27,6 +27,7 @@
 #include "CubeSolidGeometryScene.h"
 #include "CubeFlatIndependentScene.h"
 #include "GeometryFlatScene.h"
+#include "ShrinkScene.h"
 #include <sstream>
 
 Game::Game(MainWindow& wnd)
@@ -34,6 +35,8 @@ Game::Game(MainWindow& wnd)
 	wnd(wnd),
 	gfx(wnd)
 {
+	scenes.push_back(std::make_unique<ShrinkScene>(gfx,
+		IndexedTriangleList<ShrinkScene::Vertex>::Load("models\\bunny.obj")));
 	scenes.push_back(std::make_unique<VertexWaveScene>(gfx));
 	scenes.push_back(std::make_unique<GeometryFlatScene>(gfx,
 		IndexedTriangleList<GeometryFlatScene::Vertex>::Load("models\\bunny.obj")));
@@ -42,7 +45,6 @@ Game::Game(MainWindow& wnd)
 	scenes.push_back(std::make_unique<CubeSolidScene>(gfx));
 	scenes.push_back(std::make_unique<CubeSolidGeometryScene>(gfx));
 	//scenes.push_back(std::make_unique<CubeFlatIndependentScene>(gfx));
-
 
 	curScene = scenes.begin();
 	OutputSceneName();

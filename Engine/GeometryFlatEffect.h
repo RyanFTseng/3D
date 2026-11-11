@@ -64,37 +64,7 @@ public:
 	public:
 		Vec3 pos;
 	};
-	class VertexShader
-	{
-	public:
-		typedef Vertex Output;
-	public:
-		void BindRotation(const Mat3& rotation_in)
-		{
-			rotation = rotation_in;
-		}
-		void BindTranslation(const Vec3& translation_in)
-		{
-			translation = translation_in;
-		}
-		Output operator()(const Vertex& in) const
-		{
-			Vec3 pos = in.pos * rotation + translation;
-			pos.y += amplitude * std::sin(time * freqScroll + pos.x * freqWave);
-			return{ pos };
-		}
-		void SetTime(float t)
-		{
-			time = t;
-		}
-	private:
-		Mat3 rotation;
-		Vec3 translation;
-		float time = 0.0f;
-		float freqWave = 10.0f;
-		float freqScroll = 5.0f;
-		float amplitude = 0.05f;
-	};
+	typedef DefaultVertexShader<Vertex> VertexShader;
 
 	class GeometryShader
 	{
@@ -163,6 +133,7 @@ public:
 		//generate shader output
 		Triangle<Output> operator()(const VertexShader::Output& in0, const VertexShader::Output& in1, const VertexShader::Output& in2, size_t triangle_index) const
 		{
+			
 			//calc face normal with vertex cross product
 			const auto n = ((in1.pos - in0.pos) % (in2.pos - in0.pos)).GetNormalized();
 			//calc light intensity
@@ -171,7 +142,6 @@ public:
 			const auto c = Color(color.GetHadamard(d + ambient).Saturate() * 255.0f);
 			//return triangle
 			return{ {in0.pos, c }, {in1.pos, c } , {in2.pos, c } };
-			
 		}
 		void SetDiffuseLight(const Vec3& c)
 		{

@@ -8,7 +8,7 @@
 // solid color attribute taken from table in gs and not interpolated
 //input pos
 //output pos and color
-class GeometryFlatEffect
+class ShrinkEffect
 {
 public:
 	// the vertex type that will be input into the pipeline
@@ -79,9 +79,13 @@ public:
 		}
 		Output operator()(const Vertex& in) const
 		{
-			Vec3 pos = in.pos * rotation + translation;
-			pos.y += amplitude * std::sin(time * freqScroll + pos.x * freqWave);
-			return{ pos};
+			
+			Vec3 pos = in.pos * rotation + translation;		
+
+			
+			pos.y *= 1.005f * std::abs(std::sin(time * freqScroll + freqWave));
+			pos.x *= 1.005f * std::abs(std::sin(time * freqScroll + freqWave));
+			return{ pos };
 		}
 		void SetTime(float t)
 		{
@@ -91,8 +95,8 @@ public:
 		Mat3 rotation;
 		Vec3 translation;
 		float time = 0.0f;
-		float freqWave = 10.0f;
-		float freqScroll = 5.0f;
+		float freqWave = 1.0f;
+		float freqScroll = 1.0f;
 		float amplitude = 0.05f;
 	};
 

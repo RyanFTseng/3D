@@ -138,12 +138,12 @@ public:
 	}
 	_Vec3& Saturate()
 	{
-		x = std::min(1.0f, std::max(0.0f, x));
-		y = std::min(1.0f, std::max(0.0f, y));
-		z = std::min(1.0f, std::max(0.0f, z));
+		x = (std::min)(1.0f, (std::max)(0.0f, x));
+		y = (std::min)(1.0f, (std::max)(0.0f, y));
+		z = (std::min)(1.0f, (std::max)(0.0f, z));
 		return *this;
 	}
-	_Vec3	GetSaturated() const
+	_Vec3 GetSaturated() const
 	{
 		_Vec3 temp(*this);
 		temp.Saturate();

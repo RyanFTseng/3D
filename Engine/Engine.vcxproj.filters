@@ -191,6 +191,9 @@
     <ClCompile Include="GeometryFlatEffect.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShrinkScene.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="FramebufferPS.hlsl">
